@@ -75,22 +75,32 @@
               </li>
               <li class="nav-item">
                 <a
-                  class="nav-link"
+                  class="nav-link linkLogin"
                   href="#"
                   data-bs-toggle="modal"
                   data-bs-target="#modalLogin"
-                  >Login</a
+                  style="display: none"
                 >
+                  Login
+                </a>
+                <a href="#" class="nav-link linkLogout" onclick="logout()">
+                  Logout
+                </a>
               </li>
             </ul>
             <form
               class="d-flex my-2 my-lg-0 border rounded-pill"
               id="formSearch"
+              method="get"
+              action="search.html"
             >
               <input
                 class="form-control ms-3 border-0"
                 type="text"
                 placeholder="Search"
+                name="keyword"
+                id="keyword"
+                required
               />
               <button class="btn my-2 my-sm-0 border-0" type="submit">
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -172,7 +182,7 @@
                   id="email"
                   placeholder=""
                   required
-                  pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+                  pattern="[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,3}"
                 />
               </div>
             </div>
@@ -242,12 +252,17 @@
         </li>
         <li class="nav-item">
           <a
-            class="nav-link"
+            class="nav-link linkLogin"
             href="#"
             data-bs-toggle="modal"
             data-bs-target="#modalLogin"
-            >Login</a
+            style="display: none"
           >
+            Login
+          </a>
+          <a href="#" class="nav-link linkLogout" onclick="logout()">
+            Logout
+          </a>
         </li>
       </ul>
       <p class="text-white-50">
@@ -280,7 +295,12 @@
             ></button>
           </div>
           <div class="modal-body">
-            <form action="#" method="post" id="formLogin">
+            <form
+              action="#"
+              method="post"
+              id="formLogin"
+              onsubmit="login(event)"
+            >
               <h3 class="text-center">Login Form</h3>
               <div class="mb-3">
                 <input
@@ -289,6 +309,7 @@
                   id="username"
                   placeholder="username"
                   class="form-control"
+                  required
                 />
               </div>
               <div class="mb-3">
@@ -298,12 +319,15 @@
                   id="password"
                   placeholder="Password"
                   class="form-control"
+                  required
                 />
               </div>
               <button type="submit" class="form-control btn">Login</button>
             </form>
           </div>
-          <div class="modal-footer"></div>
+          <div class="modal-footer justify-content-center">
+            <div class="text-danger" id="errorMessage"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -336,6 +360,7 @@
 
     <script src="js/23880052.js"></script>
     <script>
+      checkLogin();
       function onSubmit(e) {
         e.preventDefault();
         grecaptcha.enterprise.ready(async () => {

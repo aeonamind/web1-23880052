@@ -75,22 +75,32 @@
               </li>
               <li class="nav-item">
                 <a
-                  class="nav-link"
+                  class="nav-link linkLogin"
                   href="#"
                   data-bs-toggle="modal"
                   data-bs-target="#modalLogin"
-                  >Login</a
+                  style="display: none"
                 >
+                  Login
+                </a>
+                <a href="#" class="nav-link linkLogout" onclick="logout()">
+                  Logout
+                </a>
               </li>
             </ul>
             <form
               class="d-flex my-2 my-lg-0 border rounded-pill"
               id="formSearch"
+              method="get"
+              action="search.html"
             >
               <input
                 class="form-control ms-3 border-0"
                 type="text"
                 placeholder="Search"
+                name="keyword"
+                id="keyword"
+                required
               />
               <button class="btn my-2 my-sm-0 border-0" type="submit">
                 <i class="fa-solid fa-magnifying-glass"></i>
@@ -130,12 +140,17 @@
         </li>
         <li class="nav-item">
           <a
-            class="nav-link"
+            class="nav-link linkLogin"
             href="#"
             data-bs-toggle="modal"
             data-bs-target="#modalLogin"
-            >Login</a
+            style="display: none"
           >
+            Login
+          </a>
+          <a href="#" class="nav-link linkLogout" onclick="logout()">
+            Logout
+          </a>
         </li>
       </ul>
       <p class="text-white-50">
@@ -168,7 +183,12 @@
             ></button>
           </div>
           <div class="modal-body">
-            <form action="#" method="post" id="formLogin">
+            <form
+              action="#"
+              method="post"
+              id="formLogin"
+              onsubmit="login(event)"
+            >
               <h3 class="text-center">Login Form</h3>
               <div class="mb-3">
                 <input
@@ -177,6 +197,7 @@
                   id="username"
                   placeholder="username"
                   class="form-control"
+                  required
                 />
               </div>
               <div class="mb-3">
@@ -186,12 +207,15 @@
                   id="password"
                   placeholder="Password"
                   class="form-control"
+                  required
                 />
               </div>
               <button type="submit" class="form-control btn">Login</button>
             </form>
           </div>
-          <div class="modal-footer"></div>
+          <div class="modal-footer justify-content-center">
+            <div class="text-danger" id="errorMessage"></div>
+          </div>
         </div>
       </div>
     </div>
@@ -317,9 +341,15 @@
           />
           <div class='text-black-50'>{{{description}}}</div>
         </div>
-        <div class='py-3'>
+        <div class='py-3' id='leave-comment'>
           <h3>Leave your comments</h3>
-          <form action='#' method='post' class='text-black-50'>
+          <form
+            action='#'
+            method='post'
+            class='text-black-50'
+            onsubmit='addComment(event)'
+          >
+            <input type='hidden' name='blogId' id='blogId' value='{{id}}' />
             <div class='row'>
               <div class='col-4'>
                 <div class='mb-3'>
@@ -343,7 +373,7 @@
                     name='email'
                     id='email'
                     placeholder=''
-                    pattern='[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$'
+                    pattern='[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,3}'
                   />
                 </div>
               </div>
@@ -352,8 +382,8 @@
               <div class='mb-3'>
                 <textarea
                   class='form-control'
-                  name='message'
-                  id='message'
+                  name='comment'
+                  id='comment'
                   rows='3'
                   placeholder='Enter your message'
                   required
@@ -382,6 +412,9 @@
                 </button>
               </div>
             </div>
+            <div class='text-center'>
+              <div class='text-success' id='responseMessage'></div>
+            </div>
           </form>
         </div>
 
@@ -403,6 +436,8 @@
     </script>
 
     <script>
+      checkLogin();
+
       Handlebars.registerHelper('formatDate', function (date) {
         let formatDate = new Date(date);
         let options = {
@@ -436,8 +471,47 @@
 
       async function loadBlogDetails(blogId, gotoComments = false) {
         await loadData(`blogs/${blogId}`, 'details-template', 'blogs');
+        checkLogin();
         if (gotoComments) {
           window.location.href = '#comments';
+        }
+      }
+
+      async function addComment(e) {
+        e.preventDefault();
+
+        let token = localStorage.getItem('token');
+        let postData = {
+          name: document.getElementById('name').value,
+          email: document.getElementById('email').value,
+          comment: document.getElementById('comment').value,
+          blogId: document.getElementById('blogId').value,
+          agree: document.getElementById('agree').value == 1,
+        };
+
+        const responseMessage = document.getElementById('responseMessage');
+
+        try {
+          let response = await fetch(`${AUTHENTICATE_API}/comment`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              Accept: 'application/json',
+              Authorization: 'Bearer ' + token,
+            },
+            body: JSON.stringify(postData),
+          });
+
+          let result = await response.json();
+
+          if (response.status === 200) {
+            loadBlogDetails(postData.blogId, true);
+          } else {
+            throw new Error(result.message);
+          }
+        } catch (error) {
+          responseMessage.innerHTML = result.message;
+          responseMessage.className = 'text-danger';
         }
       }
     </script>
