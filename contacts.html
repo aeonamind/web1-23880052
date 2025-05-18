@@ -361,15 +361,6 @@
     <script src="js/23880052.js"></script>
     <script>
       checkLogin();
-      function onSubmit(e) {
-        e.preventDefault();
-        grecaptcha.enterprise.ready(async () => {
-          const token = await grecaptcha.enterprise.execute(
-            '6LdBHzorAAAAABh9XXspHgcpYk7Kwrew0S26Hp_a',
-            { action: 'submit' }
-          );
-        });
-      }
 
       async function sendMail() {
         try {
