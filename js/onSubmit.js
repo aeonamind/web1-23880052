@@ -1,6 +1,6 @@
 const CAPTCHA_SITE_KEY = '6LdBHzorAAAAABh9XXspHgcpYk7Kwrew0S26Hp_a';
 const CAPTCHA_PROJECT_ID = 'web1-23880052';
-const CAPTCHA_API_KEY = '6LdBHzorAAAAABh9XXspHgcpYk7Kwrew0S26Hp_a';
+const CAPTCHA_API_KEY = 'AIzaSyAQZmphGZVecaxUzPzrjsqVGNzWDtGFNrY';
 
 function onSubmit(e) {
   e.preventDefault();
